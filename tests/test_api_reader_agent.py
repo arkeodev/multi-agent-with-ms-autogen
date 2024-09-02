@@ -1,5 +1,7 @@
-from agents import APIReaderAgent
 import openai
+
+from agents import APIReaderAgent
+
 
 def test_api_reader_agent():
     agent = APIReaderAgent(name="API Reader")
@@ -9,6 +11,7 @@ def test_api_reader_agent():
     llm = openai.Completion.create
     result = agent.perform_task(api_url, api_key, llm)
     print(result)
+
 
 if __name__ == "__main__":
     test_api_reader_agent()

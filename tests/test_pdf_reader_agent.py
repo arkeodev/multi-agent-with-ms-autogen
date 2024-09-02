@@ -1,5 +1,7 @@
-from agents import PDFReaderAgent
 import openai
+
+from agents import PDFReaderAgent
+
 
 def test_pdf_reader_agent():
     agent = PDFReaderAgent(name="PDF Reader")
@@ -8,6 +10,7 @@ def test_pdf_reader_agent():
     llm = openai.Completion.create
     content = agent.perform_task(file_path, llm)
     print(content)
+
 
 if __name__ == "__main__":
     test_pdf_reader_agent()

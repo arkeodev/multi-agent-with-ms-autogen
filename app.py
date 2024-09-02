@@ -1,90 +1,90 @@
-import streamlit as st
-from agents import ChatBot
-from chatbot import (
-    get_model_response,
-    define_problem_conversation,
-    refine_problem_definition,
-    delegate_tasks,
-    execute_tasks
-)
-from utils import set_api_keys
-import openai
+import logging
+from typing import Dict
+
+from openai import OpenAI
+
+from chatbot import ChatBot
+from utils import create_rag_collection
+
 
 class Application:
-    def __init__(self, llm_config, llm):
+    def __init__(self, llm_config: Dict, llm: OpenAI, model: str, temperature: float):
         self.llm_config = llm_config
         self.llm = llm
+        self.model = model
+        self.temperature = temperature
         # Initialize ChatBot with the llm_config
         self.chatbot = ChatBot(self.llm_config)
 
     def process_user_input(self, user_input):
+        self.user_input = user_input
         # Define the problem through conversation
-        problem_definition = define_problem_conversation(user_input, self.llm)
-        
+        self.define_problem_conversation()
         # Refine the problem definition
-        refined_problem = refine_problem_definition(problem_definition, self.llm)
-        
+        self.refine_problem_definition()
         # Delegate tasks
-        tasks_and_agents = delegate_tasks(refined_problem, self.llm)
-        
+        self.delegate_tasks()
         # Execute tasks
-        execution_result = execute_tasks(tasks_and_agents, self.llm)
-        
+        self.execute_tasks()
         # Get final response
-        final_response = get_model_response(execution_result, self.llm)
-        
-        return final_response
+        return self.get_model_response()
 
-    def generate_report(self):
-        # Implement report generation logic
-        return "Generated report content"
+    def define_problem_conversation(self) -> str:
+        logging.info("Defining problem through conversation.")
+        prompt = f"User input: {self.user_input}\nDefine the problem or task based on this input:"
+        response = self.llm.chat.completions.create(
+            model=self.model,
+            messages=[{"role": "user", "content": prompt}],
+            temperature=self.temperature,
+        )
+        self.problem_definition = response.choices[0].message.content
+        logging.info("Problem defined.")
+
+    def refine_problem_definition(self) -> str:
+        logging.info("Refining problem definition.")
+        prompt = f"Refine the problem definition: {self.problem_definition}"
+        response = self.llm.chat.completions.create(
+            model=self.model,
+            messages=[{"role": "user", "content": prompt}],
+            temperature=self.temperature,
+        )
+        self.refined_problem_definition = response.choices[0].message.content
+        logging.info("Problem definition refined.")
+
+    def delegate_tasks(self):
+        logging.info("Delegating tasks based on problem definition.")
+        prompt = f"Based on the problem definition: {self.refined_problem_definition}, list the tasks and the agents required to solve the problem."
+        response = self.llm.chat.completions.create(
+            model=self.model,
+            messages=[{"role": "user", "content": prompt}],
+            temperature=self.temperature,
+        )
+        self.tasks_and_agents = response.choices[0].message.content
+        logging.info("Tasks and agents listed.")
+
+    def execute_tasks(self):
+        logging.info("Executing tasks.")
+        prompt = f"Execute the following tasks: {self.tasks_and_agents}"
+        response = self.llm.chat.completions.create(
+            model=self.model,
+            messages=[{"role": "user", "content": prompt}],
+            temperature=self.temperature,
+        )
+        self.execution_result = response.choices[0].message.content
+        logging.info("Tasks executed.")
+
+    def get_model_response(self):
+        logging.info("Getting model response for user input.")
+        prompt = f"Get the final response for the user input: {self.execution_result}"
+        response = self.llm.chat.completions.create(
+            model=self.model,
+            messages=[{"role": "user", "content": prompt}],
+            temperature=self.temperature,
+        )
+        result = response.choices[0].message.content
+        logging.info("Model response received.")
+        return result
 
     def create_rag_collection(self, document_content):
-        # Implement RAG collection creation logic
-        pass
-
-def streamlit_ui():
-    st.set_page_config(layout="wide")
-    left_column, middle_column, right_column = st.columns([1, 2, 2])
-
-    # Left column: Model selection, temperature adjustment, API URL, and API key
-    with left_column:
-        st.expander("Settings", expanded=True)
-        model = st.selectbox("Select Model", ["gpt-4o-mini", "gpt-4o"])
-        temperature = st.slider("Temperature", 0.0, 1.0, 0.2)
-        
-    llm_config = {"config_list": [{"model": model, "api_type": "openai", "tags": [model]}]}
-    llm = openai.chat.completions.create(model=model, temperature=temperature)
-
-    # Initialize Application
-    app = Application(llm_config, llm)
-
-    # Middle column: Chatbot interaction space
-    with middle_column:
-        st.header("Chatbot Interaction")
-        user_input = st.chat_input("Enter your query: ")
-        if user_input:
-            response = app.process_user_input(user_input)
-            st.write(f"Bot: {response}")
-
-    # Right column: Generated report and visual content
-    with right_column:
-        st.header("Generated Report")
-        report_content = app.generate_report()
-        st.write(report_content)
-
-    # File input for RAG collection
-    uploaded_file = st.file_uploader("Upload a document for RAG collection")
-    if uploaded_file:
-        document_content = uploaded_file.read().decode("utf-8")
-        app.create_rag_collection(document_content)
-        st.success("RAG collection created successfully.")
-
-    return app
-
-# Load environment variables and set API keys
-set_api_keys()
-
-# Main execution
-if __name__ == "__main__":
-    app = streamlit_ui()
+        self.rag_collection = create_rag_collection(document_content)
+        logging.info("RAG collection created and set in ChatBot.")

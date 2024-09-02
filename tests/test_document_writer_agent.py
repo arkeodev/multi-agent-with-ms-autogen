@@ -1,5 +1,7 @@
-from agents import DocumentWriterAgent
 import openai
+
+from agents import DocumentWriterAgent
+
 
 def test_document_writer_agent():
     agent = DocumentWriterAgent(name="Document Writer")
@@ -8,6 +10,7 @@ def test_document_writer_agent():
     llm = openai.Completion.create
     result = agent.perform_task(content, llm)
     print(result)
+
 
 if __name__ == "__main__":
     test_document_writer_agent()

@@ -1,5 +1,7 @@
-from agents import WikipediaAgent
 import openai
+
+from agents import WikipediaAgent
+
 
 def test_wikipedia_agent():
     agent = WikipediaAgent(name="Wikipedia Researcher")
@@ -8,6 +10,7 @@ def test_wikipedia_agent():
     llm = openai.Completion.create
     content = agent.perform_task(topic, llm)
     print(content)
+
 
 if __name__ == "__main__":
     test_wikipedia_agent()

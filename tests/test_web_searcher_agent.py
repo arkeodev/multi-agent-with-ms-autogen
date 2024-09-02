@@ -1,5 +1,7 @@
-from agents import WebSearcherAgent
 import openai
+
+from agents import WebSearcherAgent
+
 
 def test_web_searcher_agent():
     agent = WebSearcherAgent(name="Web Searcher")
@@ -9,6 +11,7 @@ def test_web_searcher_agent():
     results = agent.perform_task(query, llm)
     for result in results:
         print(result)
+
 
 if __name__ == "__main__":
     test_web_searcher_agent()

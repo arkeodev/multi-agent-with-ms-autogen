@@ -1,13 +1,15 @@
-from agents import PostgresAgent
 import openai
+
+from agents import PostgresAgent
+
 
 def test_postgres_agent():
     db_config = {
-        'dbname': 'your_db_name',
-        'user': 'your_db_user',
-        'password': 'your_db_password',
-        'host': 'your_db_host',
-        'port': 'your_db_port'
+        "dbname": "your_db_name",
+        "user": "your_db_user",
+        "password": "your_db_password",
+        "host": "your_db_host",
+        "port": "your_db_port",
     }
     agent = PostgresAgent(name="Postgres Agent", db_config=db_config)
     query = "list all users with their email addresses"
@@ -15,6 +17,7 @@ def test_postgres_agent():
     llm = openai.Completion.create
     result = agent.perform_task(query, llm)
     print(result)
+
 
 if __name__ == "__main__":
     test_postgres_agent()

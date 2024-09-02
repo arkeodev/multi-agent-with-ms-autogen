@@ -1,5 +1,7 @@
-from agents import CodeWriterAgent
 import openai
+
+from agents import CodeWriterAgent
+
 
 def test_code_writer_agent():
     agent = CodeWriterAgent(name="Code Writer")
@@ -8,6 +10,7 @@ def test_code_writer_agent():
     llm = openai.Completion.create
     result = agent.perform_task(requirements, llm)
     print(result)
+
 
 if __name__ == "__main__":
     test_code_writer_agent()

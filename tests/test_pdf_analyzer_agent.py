@@ -1,5 +1,7 @@
-from agents import PDFAnalyzerAgent
 import openai
+
+from agents import PDFAnalyzerAgent
+
 
 def test_pdf_analyzer_agent():
     agent = PDFAnalyzerAgent(name="PDF Analyzer")
@@ -8,6 +10,7 @@ def test_pdf_analyzer_agent():
     llm = openai.Completion.create
     result = agent.perform_task(file_path, llm)
     print(result)
+
 
 if __name__ == "__main__":
     test_pdf_analyzer_agent()
